@@ -1,0 +1,46 @@
+// components/profile/profile.component.scss
+.profile-container {
+  padding: 24px;
+  max-width: 800px;
+  margin: 0 auto;
+  margin-top: 64px; // Para dar espacio al navbar fijo
+
+  mat-card {
+    mat-card-header {
+      margin-bottom: 20px;
+    }
+
+    mat-form-field {
+      width: 100%;
+      margin-bottom: 16px;
+    }
+
+    .name-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 24px;
+    }
+
+    .loading-spinner {
+      display: flex;
+      justify-content: center;
+      padding: 40px;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .profile-container {
+    padding: 16px;
+
+    .name-fields {
+      grid-template-columns: 1fr;
+    }
+  }
+}
