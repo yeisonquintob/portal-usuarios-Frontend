@@ -1,103 +1,39 @@
-// components/profile/profile.component.ts
+// profile.component.ts
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { UserService } from '../../services/user.service';
 import { TokenService } from '../../services/token.service';
 import { MatSnackBar } from '@angular/material/snack-bar';
+import { MatDialog } from '@angular/material/dialog';
 
 @Component({
   selector: 'app-profile',
-  template: `
-    <div class="profile-container">
-      <mat-card>
-        <mat-card-header>
-          <mat-card-title>Mi perfil</mat-card-title>
-          <mat-card-subtitle>Gestiona tu información personal</mat-card-subtitle>
-        </mat-card-header>
-
-        <mat-card-content>
-          <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
-            <mat-form-field appearance="outline">
-              <mat-label>Usuario</mat-label>
-              <input matInput formControlName="username" readonly>
-              <mat-icon matSuffix>person</mat-icon>
-            </mat-form-field>
-
-            <div class="form-row">
-              <mat-form-field appearance="outline">
-                <mat-label>Nombre</mat-label>
-                <input matInput formControlName="firstName" required>
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>Apellido</mat-label>
-                <input matInput formControlName="lastName" required>
-              </mat-form-field>
-            </div>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Correo electrónico</mat-label>
-              <input matInput formControlName="email" type="email" required>
-              <mat-icon matSuffix>email</mat-icon>
-            </mat-form-field>
-
-            <div class="button-container">
-              <button mat-raised-button color="primary" type="submit">
-                Guardar cambios
-              </button>
-            </div>
-          </form>
-        </mat-card-content>
-      </mat-card>
-    </div>
-  `,
-  styles: [`
-    .profile-container {
-      max-width: 800px;
-      margin: 20px auto;
-      padding: 20px;
-    }
-
-    .form-row {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 20px;
-    }
-
-    mat-form-field {
-      width: 100%;
-      margin-bottom: 20px;
-    }
-
-    .button-container {
-      display: flex;
-      justify-content: flex-end;
-    }
-
-    @media (max-width: 600px) {
-      .form-row {
-        grid-template-columns: 1fr;
-      }
-    }
-  `]
+  templateUrl: './profile.component.html',
+  styleUrls: ['./profile.component.scss']
 })
 export class ProfileComponent implements OnInit {
   profileForm: FormGroup;
-  user: any;
   loading = false;
+  imagePreview: string | null = null;
+  originalUser: any = null;
+  isEditMode = false;
 
   constructor(
     private fb: FormBuilder,
     private userService: UserService,
     private tokenService: TokenService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog
   ) {
     this.profileForm = this.fb.group({
+      username: [{value: '', disabled: true}],
+      email: ['', [Validators.required, Validators.email]],
       firstName: ['', Validators.required],
       lastName: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      username: [{value: '', disabled: true}]
-    });
+      currentPassword: [''],
+      newPassword: [''],
+      confirmNewPassword: ['']
+    }, { validator: this.passwordMatchValidator });
   }
 
   ngOnInit() {
@@ -110,16 +46,17 @@ export class ProfileComponent implements OnInit {
       this.loading = true;
       this.userService.getProfile(user.id).subscribe({
         next: (profile) => {
-          this.user = profile;
+          this.originalUser = profile;
           this.profileForm.patchValue({
-            firstName: profile.firstName,
-            lastName: profile.lastName,
+            username: profile.username,
             email: profile.email,
-            username: profile.username
+            firstName: profile.firstName,
+            lastName: profile.lastName
           });
+          this.imagePreview = profile.profilePicture || null;
           this.loading = false;
         },
-        error: () => {
+        error: (error) => {
           this.snackBar.open('Error loading profile', 'Close', { duration: 3000 });
           this.loading = false;
         }
@@ -127,19 +64,101 @@ export class ProfileComponent implements OnInit {
     }
   }
 
+  toggleEditMode() {
+    this.isEditMode = !this.isEditMode;
+    if (!this.isEditMode) {
+      this.resetForm();
+    }
+  }
+
+  resetForm() {
+    if (this.originalUser) {
+      this.profileForm.patchValue({
+        email: this.originalUser.email,
+        firstName: this.originalUser.firstName,
+        lastName: this.originalUser.lastName,
+        currentPassword: '',
+        newPassword: '',
+        confirmNewPassword: ''
+      });
+    }
+  }
+
+  onFileSelected(event: any) {
+    const file = event.target.files[0];
+    if (file) {
+      // Preview image
+      const reader = new FileReader();
+      reader.onload = () => {
+        this.imagePreview = reader.result as string;
+      };
+      reader.readAsDataURL(file);
+
+      // Upload image
+      const user = this.tokenService.getUser();
+      if (user?.id) {
+        this.loading = true;
+        this.userService.updateProfilePicture(user.id, file).subscribe({
+          next: (response) => {
+            this.snackBar.open('Profile picture updated successfully', 'Close', { duration: 3000 });
+            this.loading = false;
+          },
+          error: (error) => {
+            this.snackBar.open('Error updating profile picture', 'Close', { duration: 3000 });
+            this.loading = false;
+          }
+        });
+      }
+    }
+  }
+
+  passwordMatchValidator(form: FormGroup) {
+    const newPassword = form.get('newPassword')?.value;
+    const confirmPassword = form.get('confirmNewPassword')?.value;
+
+    if (newPassword || confirmPassword) {
+      return newPassword === confirmPassword ? null : { passwordMismatch: true };
+    }
+    return null;
+  }
+
   onSubmit() {
-    if (this.profileForm.invalid) return;
+    if (this.profileForm.invalid || !this.isEditMode) return;
 
     const user = this.tokenService.getUser();
     if (user?.id) {
       this.loading = true;
-      this.userService.updateProfile(user.id, this.profileForm.getRawValue()).subscribe({
-        next: () => {
+      // Filter out password fields if they're empty
+      const formValue = this.profileForm.value;
+      const updateData: any = {
+        email: formValue.email,
+        firstName: formValue.firstName,
+        lastName: formValue.lastName
+      };
+
+      if (formValue.currentPassword && formValue.newPassword) {
+        updateData.currentPassword = formValue.currentPassword;
+        updateData.newPassword = formValue.newPassword;
+        updateData.confirmNewPassword = formValue.confirmNewPassword;
+      }
+
+      this.userService.updateProfile(user.id, updateData).subscribe({
+        next: (response) => {
           this.snackBar.open('Profile updated successfully', 'Close', { duration: 3000 });
+          this.originalUser = response;
+          this.isEditMode = false;
           this.loading = false;
+          
+          // Update stored user data
+          this.tokenService.saveUser({
+            ...user,
+            firstName: response.firstName,
+            lastName: response.lastName,
+            email: response.email
+          });
         },
-        error: () => {
-          this.snackBar.open('Error updating profile', 'Close', { duration: 3000 });
+        error: (error) => {
+          this.snackBar.open(error.error?.message || 'Error updating profile', 'Close', { duration: 3000 });
           this.loading = false;
         }
       });

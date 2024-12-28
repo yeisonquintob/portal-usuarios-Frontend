@@ -1,57 +1,117 @@
-<!-- components/profile/profile.component.html -->
+<!-- profile.component.html -->
 <div class="profile-container">
-    <mat-card>
-      <mat-card-header>
-        <mat-card-title>Profile</mat-card-title>
-      </mat-card-header>
-  
-      <mat-card-content>
-        <div *ngIf="loading" class="loading-spinner">
-          <mat-spinner diameter="40"></mat-spinner>
+  <mat-card>
+    <mat-card-header>
+      <div mat-card-avatar class="profile-avatar" 
+           [style.backgroundImage]="imagePreview ? 'url(' + imagePreview + ')' : ''">
+        <mat-icon *ngIf="!imagePreview">person</mat-icon>
+      </div>
+      <mat-card-title>Mi Perfil</mat-card-title>
+      <mat-card-subtitle>Gestiona tu información personal</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <!-- Loading Spinner -->
+      <div *ngIf="loading" class="loading-container">
+        <mat-spinner diameter="40"></mat-spinner>
+      </div>
+
+      <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" *ngIf="!loading">
+        <!-- Profile Picture Section -->
+        <div class="profile-picture-section">
+          <input type="file" #fileInput hidden (change)="onFileSelected($event)" accept="image/*">
+          <button mat-stroked-button type="button" (click)="fileInput.click()" [disabled]="!isEditMode">
+            <mat-icon>photo_camera</mat-icon>
+            Cambiar foto de perfil
+          </button>
         </div>
-  
-        <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" *ngIf="!loading">
+
+        <!-- Basic Information -->
+        <div class="form-section">
+          <h3>Información Básica</h3>
+          
           <mat-form-field appearance="outline">
-            <mat-label>Username</mat-label>
-            <input matInput formControlName="username" readonly>
+            <mat-label>Usuario</mat-label>
+            <input matInput formControlName="username">
+            <mat-icon matSuffix>person</mat-icon>
           </mat-form-field>
-  
-          <div class="name-fields">
+
+          <div class="form-row">
             <mat-form-field appearance="outline">
-              <mat-label>First Name</mat-label>
-              <input matInput formControlName="firstName">
+              <mat-label>Nombre</mat-label>
+              <input matInput formControlName="firstName" [readonly]="!isEditMode">
               <mat-error *ngIf="profileForm.get('firstName')?.errors?.['required']">
-                First name is required
+                El nombre es requerido
               </mat-error>
             </mat-form-field>
-  
+
             <mat-form-field appearance="outline">
-              <mat-label>Last Name</mat-label>
-              <input matInput formControlName="lastName">
+              <mat-label>Apellido</mat-label>
+              <input matInput formControlName="lastName" [readonly]="!isEditMode">
               <mat-error *ngIf="profileForm.get('lastName')?.errors?.['required']">
-                Last name is required
+                El apellido es requerido
               </mat-error>
             </mat-form-field>
           </div>
-  
+
           <mat-form-field appearance="outline">
-            <mat-label>Email</mat-label>
-            <input matInput formControlName="email" type="email">
+            <mat-label>Correo electrónico</mat-label>
+            <input matInput formControlName="email" type="email" [readonly]="!isEditMode">
+            <mat-icon matSuffix>email</mat-icon>
             <mat-error *ngIf="profileForm.get('email')?.errors?.['required']">
-              Email is required
+              El correo electrónico es requerido
             </mat-error>
             <mat-error *ngIf="profileForm.get('email')?.errors?.['email']">
-              Please enter a valid email
+              Por favor ingrese un correo electrónico válido
             </mat-error>
           </mat-form-field>
-  
-          <div class="actions">
-            <button mat-raised-button color="primary" type="submit" 
-                    [disabled]="profileForm.invalid || loading">
-              Save Changes
+        </div>
+
+        <!-- Password Change Section (Only visible in edit mode) -->
+        <div class="form-section" *ngIf="isEditMode">
+          <h3>Cambiar Contraseña</h3>
+          
+          <mat-form-field appearance="outline">
+            <mat-label>Contraseña actual</mat-label>
+            <input matInput type="password" formControlName="currentPassword">
+            <mat-icon matSuffix>lock</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Nueva contraseña</mat-label>
+            <input matInput type="password" formControlName="newPassword">
+            <mat-icon matSuffix>lock_clock</mat-icon>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Confirmar nueva contraseña</mat-label>
+            <input matInput type="password" formControlName="confirmNewPassword">
+            <mat-icon matSuffix>lock_clock</mat-icon>
+            <mat-error *ngIf="profileForm.errors?.['passwordMismatch']">
+              Las contraseñas no coinciden
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="button-container">
+          <button mat-stroked-button type="button" (click)="toggleEditMode()" *ngIf="!isEditMode">
+            <mat-icon>edit</mat-icon>
+            Editar Perfil
+          </button>
+          
+          <ng-container *ngIf="isEditMode">
+            <button mat-stroked-button type="button" (click)="toggleEditMode()">
+              <mat-icon>close</mat-icon>
+              Cancelar
             </button>
-          </div>
-        </form>
-      </mat-card-content>
-    </mat-card>
-  </div>
+            <button mat-raised-button color="primary" type="submit" [disabled]="profileForm.invalid">
+              <mat-icon>save</mat-icon>
+              Guardar Cambios
+            </button>
+          </ng-container>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

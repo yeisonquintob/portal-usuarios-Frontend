@@ -20,6 +20,7 @@ import { UserListComponent } from './components/admin/user-list/user-list.compon
 // Interceptors
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { ErrorInterceptor } from './interceptors/error.interceptor';
+import { MatSnackBarModule } from '@angular/material/snack-bar';
 
 @NgModule({
   declarations: [
@@ -37,7 +38,9 @@ import { ErrorInterceptor } from './interceptors/error.interceptor';
     BrowserAnimationsModule,
     ReactiveFormsModule,
     HttpClientModule,
-    MaterialModule
+    MaterialModule,
+    MatSnackBarModule
+
   ],
   providers: [
     { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },

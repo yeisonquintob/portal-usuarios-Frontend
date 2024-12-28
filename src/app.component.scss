@@ -1,5 +1,12 @@
 // app.component.scss
+:host {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
 main {
-    min-height: calc(100vh - 120px); // Ajusta según altura de navbar y footer
-    padding: 20px;
-  }
+  flex: 1;
+  padding: 20px;
+  margin-top: 64px; // Altura del navbar
+}

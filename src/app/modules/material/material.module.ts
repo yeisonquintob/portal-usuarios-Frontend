@@ -8,8 +8,9 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatMenuModule } from '@angular/material/menu';
+import { MatDialogModule } from '@angular/material/dialog';
 import { MatDividerModule } from '@angular/material/divider';
+import { MatMenuModule } from '@angular/material/menu';
 
 @NgModule({
   exports: [
@@ -21,8 +22,9 @@ import { MatDividerModule } from '@angular/material/divider';
     MatIconModule,
     MatProgressSpinnerModule,
     MatSnackBarModule,
-    MatMenuModule,
-    MatDividerModule  // Agregamos el módulo del divisor
+    MatDialogModule,
+    MatDividerModule,
+    MatMenuModule
   ]
 })
 export class MaterialModule { }
