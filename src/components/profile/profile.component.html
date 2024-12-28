@@ -1,0 +1,62 @@
+<!-- profile.component.html -->
+<div class="profile-container">
+  <div class="profile-header">
+    <h2>Mi perfil</h2>
+    <p class="subtitle">Gestiona tu información personal</p>
+  </div>
+
+  <div class="profile-content">
+    <div *ngIf="loading" class="loading-spinner">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+
+    <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" *ngIf="!loading">
+      <div class="form-field">
+        <label>Usuario</label>
+        <div class="input-with-icon">
+          <input type="text" formControlName="username" readonly>
+          <mat-icon>person</mat-icon>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label>Nombre*</label>
+          <input type="text" formControlName="firstName">
+          <div class="error" *ngIf="profileForm.get('firstName')?.errors?.['required'] && profileForm.get('firstName')?.touched">
+            El nombre es requerido
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label>Apellido*</label>
+          <input type="text" formControlName="lastName">
+          <div class="error" *ngIf="profileForm.get('lastName')?.errors?.['required'] && profileForm.get('lastName')?.touched">
+            El apellido es requerido
+          </div>
+        </div>
+      </div>
+
+      <div class="form-field">
+        <label>Correo electrónico*</label>
+        <div class="input-with-icon">
+          <input type="email" formControlName="email">
+          <mat-icon>mail</mat-icon>
+        </div>
+        <div class="error" *ngIf="profileForm.get('email')?.errors?.['required'] && profileForm.get('email')?.touched">
+          El correo electrónico es requerido
+        </div>
+        <div class="error" *ngIf="profileForm.get('email')?.errors?.['email'] && profileForm.get('email')?.touched">
+          Ingrese un correo electrónico válido
+        </div>
+      </div>
+
+      <div class="actions">
+        <button mat-raised-button color="primary" type="submit" 
+                [disabled]="profileForm.invalid || loading">
+          Guardar cambios
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

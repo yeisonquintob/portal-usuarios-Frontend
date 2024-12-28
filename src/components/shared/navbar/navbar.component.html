@@ -1,0 +1,22 @@
+<!-- components/shared/navbar/navbar.component.html -->
+<mat-toolbar color="primary">
+    <span>User Portal</span>
+    <span class="spacer"></span>
+    
+    <ng-container *ngIf="isLoggedIn">
+      <button mat-button routerLink="/profile">
+        <mat-icon>person</mat-icon>
+        {{ userFullName }}
+      </button>
+      
+      <button mat-button *ngIf="isAdmin" routerLink="/admin/users">
+        <mat-icon>group</mat-icon>
+        Manage Users
+      </button>
+      
+      <button mat-button (click)="logout()">
+        <mat-icon>exit_to_app</mat-icon>
+        Logout
+      </button>
+    </ng-container>
+  </mat-toolbar>

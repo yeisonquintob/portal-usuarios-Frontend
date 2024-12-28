@@ -1,0 +1,23 @@
+// src/styles.scss
+html, body {
+    height: 100%;
+    margin: 0;
+  }
+  
+  body {
+    margin: 0;
+    font-family: Roboto, "Helvetica Neue", sans-serif;
+    padding-top: 64px;
+    padding-bottom: 56px;
+  }
+  
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 16px;
+  }
+  
+  main {
+    min-height: calc(100vh - 120px);
+    padding: 20px;
+  }

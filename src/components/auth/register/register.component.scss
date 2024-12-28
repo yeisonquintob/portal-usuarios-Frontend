@@ -1,0 +1,54 @@
+// components/auth/register/register.component.scss
+.register-container {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 16px;
+  
+    mat-card {
+      width: 100%;
+      max-width: 500px;
+    }
+  
+    mat-form-field {
+      width: 100%;
+      margin-bottom: 16px;
+    }
+  
+    .name-fields {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+  
+    .actions {
+      display: flex;
+      gap: 16px;
+      margin: 24px 0;
+    }
+  
+    .error-message {
+      margin-top: 16px;
+      text-align: center;
+    }
+  }
+  
+  // Media query para pantallas pequeñas
+  @media (max-width: 600px) {
+    .register-container {
+      padding: 8px;
+  
+      .name-fields {
+        grid-template-columns: 1fr;
+      }
+  
+      .actions {
+        flex-direction: column;
+        
+        button {
+          width: 100%;
+        }
+      }
+    }
+  }
