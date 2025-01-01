@@ -8,6 +8,24 @@
     padding: 1.5rem;
   }
 
+  .user-header {
+    text-align: center;
+    margin: 0.5rem 0 0.5rem; // Reducido el espacio
+    
+    h2 {
+      margin: 0;
+      font-weight: 500;
+      color: rgba(0, 0, 0, 0.87); // Color más oscuro
+    }
+    
+    .username-display {
+      font-size: 1.5rem;
+      margin: 0.5rem 0;
+      font-weight: 500;
+      color: rgba(0, 0, 0, 0.87); // Color más oscuro
+    }
+  }
+
   .profile-avatar {
     width: 100px;
     height: 100px;
@@ -36,17 +54,6 @@
     min-height: 200px;
   }
 
-  .profile-picture-section {
-    text-align: center;
-    margin: 2rem 0;
-
-    button {
-      mat-icon {
-        margin-right: 0.5rem;
-      }
-    }
-  }
-
   .name-fields {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -63,6 +70,34 @@
     margin-bottom: 1rem;
   }
 
+  .additional-info {
+    margin: 1rem 0;
+    padding: 1rem;
+    background-color: #f8f9fa;
+    border-radius: 4px;
+
+    .info-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 0;
+      border-bottom: 1px solid #e9ecef;
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .info-label {
+        font-weight: 500;
+        color: rgba(0, 0, 0, 0.87);
+      }
+
+      .info-value {
+        color: rgba(0, 0, 0, 0.7);
+      }
+    }
+  }
+
   .password-section {
     margin: 2rem 0;
     padding: 1.5rem;
@@ -76,31 +111,18 @@
       font-size: 1.1rem;
       font-weight: 500;
     }
-
-    mat-form-field {
-      width: 100%;
-      margin-bottom: 1rem;
-
-      &:last-child {
-        margin-bottom: 0;
-      }
-    }
-
-    .mat-icon-button {
-      color: rgba(0, 0, 0, 0.54);
-    }
   }
 
   .button-container {
     display: flex;
-    justify-content: flex-end;
+    justify-content: center;
     gap: 1rem;
     margin-top: 2rem;
     padding-top: 1rem;
     border-top: 1px solid #e0e0e0;
 
     button {
-      min-width: 120px;
+      min-width: 150px;
 
       mat-icon {
         margin-right: 0.5rem;
@@ -112,139 +134,6 @@
       
       button {
         width: 100%;
-      }
-    }
-  }
-
-  .mat-mdc-card-header {
-    margin-bottom: 2rem;
-    padding: 1rem 0;
-    border-bottom: 1px solid #e0e0e0;
-
-    .mat-mdc-card-title {
-      font-size: 1.5rem;
-      margin-bottom: 0.5rem;
-    }
-
-    .mat-mdc-card-subtitle {
-      font-size: 1rem;
-      color: rgba(0, 0, 0, 0.6);
-    }
-  }
-
-  // Estilos para los campos deshabilitados
-  .mat-mdc-form-field-disabled {
-    .mat-mdc-form-field-flex {
-      background-color: #f5f5f5;
-    }
-  }
-
-  // Estilos para los errores de validación
-  .mat-mdc-form-field-error {
-    font-size: 0.75rem;
-    margin-top: 0.25rem;
-  }
-
-  // Animaciones
-  .mat-mdc-card {
-    transition: box-shadow 0.3s ease-in-out;
-
-    &:hover {
-      box-shadow: 0 8px 16px rgba(0,0,0,0.1);
-    }
-  }
-
-  // Estilos para el modo de edición
-  .edit-mode {
-    .mat-mdc-form-field {
-      animation: fadeIn 0.3s ease-in-out;
-    }
-  }
-
-  // Estilos para el spinner de carga
-  .mat-mdc-progress-spinner {
-    margin: 0 auto;
-  }
-
-  // Estados de hover para botones
-  button.mat-mdc-raised-button {
-    &:not([disabled]) {
-      &:hover {
-        transform: translateY(-1px);
-        transition: transform 0.2s ease;
-      }
-    }
-  }
-
-  // Media queries para responsividad adicional
-  @media (max-width: 400px) {
-    .profile-picture-section {
-      button {
-        width: 100%;
-      }
-    }
-
-    .password-section {
-      padding: 1rem;
-      margin: 1rem 0;
-    }
-  }
-
-  // Animaciones
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(-10px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-}
-
-// Estilos globales para las notificaciones
-:host ::ng-deep {
-  .success-snackbar {
-    background: #4caf50;
-    color: white;
-
-    .mat-mdc-button {
-      color: white;
-    }
-  }
-
-  .error-snackbar {
-    background: #f44336;
-    color: white;
-
-    .mat-mdc-button {
-      color: white;
-    }
-  }
-
-  // Override para el tema Material
-  .mat-mdc-form-field {
-    &.mat-focused {
-      .mat-mdc-form-field-label {
-        color: inherit;
-      }
-    }
-  }
-
-  .mat-mdc-snack-bar-container {
-    &.success-snackbar, &.error-snackbar {
-      .mdc-snackbar__surface {
-        padding: 0 16px;
-      }
-
-      .mat-mdc-snack-bar-label {
-        padding: 14px 0;
-      }
-
-      .mat-mdc-snack-bar-actions {
-        padding: 14px 0;
-        margin-right: -8px;
       }
     }
   }

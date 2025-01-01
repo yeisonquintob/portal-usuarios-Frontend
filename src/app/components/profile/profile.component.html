@@ -7,6 +7,7 @@
         <mat-icon *ngIf="!imagePreview">person</mat-icon>
       </div>
       <mat-card-title>Mi Perfil</mat-card-title>
+      <mat-card-title> Usuario: {{profileForm.get('username')?.value}} </mat-card-title>
       <mat-card-subtitle>Gestiona tu información personal</mat-card-subtitle>
     </mat-card-header>
 
@@ -16,33 +17,10 @@
       </div>
 
       <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" *ngIf="!loading">
-        <!-- Sección de foto de perfil -->
-        <div class="profile-picture-section">
-          <input type="file" #fileInput hidden (change)="onFileSelected($event)" accept="image/*">
-          <button mat-stroked-button type="button" (click)="fileInput.click()" [disabled]="!isEditMode">
-            <mat-icon>photo_camera</mat-icon>
-            Cambiar foto de perfil
-          </button>
-        </div>
+        <!-- Usuario (más destacado) -->
 
-        <mat-form-field appearance="outline">
-          <mat-label>Usuario</mat-label>
-          <input matInput formControlName="username" readonly>
-          <mat-icon matSuffix>person</mat-icon>
-        </mat-form-field>
 
-        <mat-form-field appearance="outline">
-          <mat-label>Correo electrónico</mat-label>
-          <input matInput formControlName="email" [readonly]="!isEditMode">
-          <mat-icon matSuffix>email</mat-icon>
-          <mat-error *ngIf="emailControl?.errors?.['required']">
-            El correo electrónico es requerido
-          </mat-error>
-          <mat-error *ngIf="emailControl?.errors?.['email']">
-            Ingrese un correo electrónico válido
-          </mat-error>
-        </mat-form-field>
-
+        <!-- Campos de nombre y apellido -->
         <div class="name-fields">
           <mat-form-field appearance="outline">
             <mat-label>Nombre</mat-label>
@@ -61,6 +39,32 @@
           </mat-form-field>
         </div>
 
+        <!-- Campo de correo electrónico -->
+        <mat-form-field appearance="outline">
+          <mat-label>Correo electrónico</mat-label>
+          <input matInput formControlName="email" [readonly]="!isEditMode">
+          <mat-icon matSuffix>email</mat-icon>
+          <mat-error *ngIf="emailControl?.errors?.['required']">
+            El correo electrónico es requerido
+          </mat-error>
+          <mat-error *ngIf="emailControl?.errors?.['email']">
+            Ingrese un correo electrónico válido
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Información adicional -->
+        <div class="additional-info">
+          <div class="info-row">
+            <span class="info-label">Rol:</span>
+            <span class="info-value">{{originalUser?.role || 'Usuario'}}</span>
+          </div>
+
+          <div class="info-row">
+            <span class="info-label">Último acceso:</span>
+            <span class="info-value">{{originalUser?.lastLogin | date:'medium' || 'No disponible'}}</span>
+          </div>
+        </div>
+
         <!-- Sección de cambio de contraseña -->
         <div class="password-section" *ngIf="isEditMode">
           <h3>Cambiar Contraseña</h3>
@@ -72,9 +76,6 @@
             <button mat-icon-button matSuffix (click)="hideCurrentPassword = !hideCurrentPassword" type="button">
               <mat-icon>{{hideCurrentPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
             </button>
-            <mat-error *ngIf="profileForm.hasError('currentPasswordRequired')">
-              La contraseña actual es requerida para cambiar la contraseña
-            </mat-error>
           </mat-form-field>
 
           <mat-form-field appearance="outline">
@@ -84,9 +85,6 @@
             <button mat-icon-button matSuffix (click)="hideNewPassword = !hideNewPassword" type="button">
               <mat-icon>{{hideNewPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
             </button>
-            <mat-error *ngIf="profileForm.get('newPassword')?.errors?.['pattern']">
-              La contraseña debe contener al menos 8 caracteres, una mayúscula, una minúscula y un número
-            </mat-error>
           </mat-form-field>
 
           <mat-form-field appearance="outline">
@@ -96,13 +94,17 @@
             <button mat-icon-button matSuffix (click)="hideConfirmPassword = !hideConfirmPassword" type="button">
               <mat-icon>{{hideConfirmPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
             </button>
-            <mat-error *ngIf="profileForm.hasError('passwordMismatch')">
-              Las contraseñas no coinciden
-            </mat-error>
           </mat-form-field>
         </div>
 
         <div class="button-container">
+          <input type="file" #fileInput hidden (change)="onFileSelected($event)" accept="image/*">
+          
+          <button mat-stroked-button type="button" (click)="fileInput.click()">
+            <mat-icon>photo_camera</mat-icon>
+            Cambiar foto de perfil
+          </button>
+
           <button mat-stroked-button type="button" (click)="toggleEditMode()" *ngIf="!isEditMode">
             <mat-icon>edit</mat-icon>
             Editar Perfil

@@ -5,67 +5,8 @@ import { TokenService } from '../../../services/token.service';
 
 @Component({
   selector: 'app-navbar',
-  template: `
-    <mat-toolbar color="primary" class="navbar">
-      <div class="container">
-        <span>Portal del usuario</span>
-        <span class="spacer"></span>
-        <ng-container *ngIf="isLoggedIn">
-          <a mat-button *ngIf="isAdmin" routerLink="/admin/users">
-            <mat-icon>group</mat-icon>
-            Gestionar Usuarios
-          </a>
-          <a mat-button class="user-profile" routerLink="/profile">
-            <mat-icon>person</mat-icon>
-            Mi perfil
-          </a>
-          <button mat-button (click)="logout()" class="logout-button">
-            <mat-icon>logout</mat-icon>
-            Cerrar sesión
-          </button>
-        </ng-container>
-      </div>
-    </mat-toolbar>
-  `,
-  styles: [`
-    .navbar {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      z-index: 1000;
-      background-color: #3f51b5;
-      height: 56px;
-    }
-
-    .container {
-      display: flex;
-      align-items: center;
-      width: 100%;
-      padding: 0 16px;
-      height: 100%;
-    }
-
-    .spacer {
-      flex: 1 1 auto;
-    }
-
-    .user-profile,
-    .logout-button {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      color: white;
-      margin-left: 8px;
-      font-weight: normal;
-    }
-
-    mat-icon {
-      font-size: 20px;
-      height: 20px;
-      width: 20px;
-    }
-  `]
+  templateUrl: './navbar.component.html',
+  styleUrls: ['./navbar.component.scss']
 })
 export class NavbarComponent {
   constructor(

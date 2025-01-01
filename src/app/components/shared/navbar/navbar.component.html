@@ -1,22 +1,31 @@
-<!-- components/shared/navbar/navbar.component.html -->
-<mat-toolbar color="primary">
-    <span>User Portal</span>
+<nav class="navbar">
+  <div class="navbar-content">
+    <!-- Logo y título -->
+    <div class="brand-section">
+      <a routerLink="/" class="brand-link">
+        <mat-icon class="brand-icon">dashboard</mat-icon>
+        <span class="brand-text">Portal de usuarios</span>
+      </a>
+    </div>
+
     <span class="spacer"></span>
-    
-    <ng-container *ngIf="isLoggedIn">
-      <button mat-button routerLink="/profile">
+
+    <!-- Navegación -->
+    <div class="nav-section" *ngIf="isLoggedIn">
+      <a mat-button routerLink="/profile" class="nav-link">
         <mat-icon>person</mat-icon>
-        {{ userFullName }}
-      </button>
-      
-      <button mat-button *ngIf="isAdmin" routerLink="/admin/users">
+        <span class="link-text">Mi perfil</span>
+      </a>
+
+      <a mat-button *ngIf="isAdmin" routerLink="/admin/users" class="nav-link">
         <mat-icon>group</mat-icon>
-        Manage Users
+        <span class="link-text">Gestionar Usuarios</span>
+      </a>
+
+      <button mat-button (click)="logout()" class="nav-link">
+        <mat-icon>logout</mat-icon>
+        <span class="link-text">Cerrar sesión</span>
       </button>
-      
-      <button mat-button (click)="logout()">
-        <mat-icon>exit_to_app</mat-icon>
-        Logout
-      </button>
-    </ng-container>
-  </mat-toolbar>
+    </div>
+  </div>
+</nav>
