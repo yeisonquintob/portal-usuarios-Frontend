@@ -1,10 +1,8 @@
-// components/shared/navbar/navbar.component.ts
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
-import { AuthService } from '../../../services/auth.service'; // Corregir ruta
-import { TokenService } from '../../../services/token.service'; // Corregir ruta
+import { AuthService } from '../../../services/auth.service';
+import { TokenService } from '../../../services/token.service';
 
-// components/shared/navbar/navbar.component.ts
 @Component({
   selector: 'app-navbar',
   template: `
@@ -13,6 +11,10 @@ import { TokenService } from '../../../services/token.service'; // Corregir ruta
         <span>Portal del usuario</span>
         <span class="spacer"></span>
         <ng-container *ngIf="isLoggedIn">
+          <a mat-button *ngIf="isAdmin" routerLink="/admin/users">
+            <mat-icon>group</mat-icon>
+            Gestionar Usuarios
+          </a>
           <a mat-button class="user-profile" routerLink="/profile">
             <mat-icon>person</mat-icon>
             Mi perfil

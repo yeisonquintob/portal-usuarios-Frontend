@@ -15,12 +15,16 @@ import { RegisterComponent } from './components/auth/register/register.component
 import { ProfileComponent } from './components/profile/profile.component';
 import { NavbarComponent } from './components/shared/navbar/navbar.component';
 import { FooterComponent } from './components/shared/footer/footer.component';
-import { UserListComponent } from './components/admin/user-list/user-list.component';
 
 // Interceptors
 import { AuthInterceptor } from './interceptors/auth.interceptor';
 import { ErrorInterceptor } from './interceptors/error.interceptor';
-import { MatSnackBarModule } from '@angular/material/snack-bar';
+
+// Services
+import { AuthService } from './services/auth.service';
+import { UserService } from './services/user.service';
+import { TokenService } from './services/token.service';
+import { NotificationService } from './services/notification.service';
 
 @NgModule({
   declarations: [
@@ -29,8 +33,7 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     RegisterComponent,
     ProfileComponent,
     NavbarComponent,
-    FooterComponent,
-    UserListComponent
+    FooterComponent
   ],
   imports: [
     BrowserModule,
@@ -38,13 +41,23 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
     BrowserAnimationsModule,
     ReactiveFormsModule,
     HttpClientModule,
-    MaterialModule,
-    MatSnackBarModule
-
+    MaterialModule
   ],
   providers: [
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
-    { provide: HTTP_INTERCEPTORS, useClass: ErrorInterceptor, multi: true }
+    { 
+      provide: HTTP_INTERCEPTORS, 
+      useClass: AuthInterceptor, 
+      multi: true 
+    },
+    { 
+      provide: HTTP_INTERCEPTORS, 
+      useClass: ErrorInterceptor, 
+      multi: true 
+    },
+    AuthService,
+    UserService,
+    TokenService,
+    NotificationService
   ],
   bootstrap: [AppComponent]
 })

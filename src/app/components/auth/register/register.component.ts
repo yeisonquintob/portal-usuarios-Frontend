@@ -1,9 +1,11 @@
-// components/auth/register/register.component.ts
+// src/app/components/auth/register/register.component.ts
 import { Component } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { NotificationService } from '../../../services/notification.service';
+import { ApiResponse } from '../../../interfaces/api-response';
+import { AuthResponse } from '../../../interfaces/auth-response.interface';
 
 @Component({
   selector: 'app-register',
@@ -11,56 +13,127 @@ import { MatSnackBar } from '@angular/material/snack-bar';
   styleUrls: ['./register.component.scss']
 })
 export class RegisterComponent {
-  registerForm: FormGroup;
+  registerForm!: FormGroup;
   loading = false;
-  error = '';
+  hidePassword = true;
+  hideConfirmPassword = true;
+  errorMessage = '';
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private snackBar: MatSnackBar
+    private notificationService: NotificationService
   ) {
-    this.registerForm = this.fb.group({
-      username: ['', [Validators.required, Validators.minLength(3)]],
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(8)]],
-      confirmPassword: ['', Validators.required],
-      firstName: ['', Validators.required],
-      lastName: ['', Validators.required]
-    }, { validator: this.passwordMatchValidator });
+    this.initForm();
   }
 
-  passwordMatchValidator(form: FormGroup) {
-    const password = form.get('password')?.value;
-    const confirmPassword = form.get('confirmPassword')?.value;
-    return password === confirmPassword ? null : { mismatch: true };
+  private initForm(): void {
+    this.registerForm = this.fb.group({
+      username: ['', [
+        Validators.required, 
+        Validators.minLength(3),
+        Validators.pattern('^[a-zA-Z0-9._-]+$')
+      ]],
+      email: ['', [
+        Validators.required, 
+        Validators.email
+      ]],
+      password: ['', [
+        Validators.required,
+        Validators.minLength(8),
+        Validators.pattern('^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d)[a-zA-Z\\d]{8,}$')
+      ]],
+      confirmPassword: ['', [
+        Validators.required
+      ]],
+      firstName: ['', [
+        Validators.required,
+        Validators.minLength(2)
+      ]],
+      lastName: ['', [
+        Validators.required,
+        Validators.minLength(2)
+      ]]
+    }, { 
+      validators: this.passwordMatchValidator 
+    });
+  }
+
+  private passwordMatchValidator(form: FormGroup): {[key: string]: boolean} | null {
+    const password = form.get('password');
+    const confirmPassword = form.get('confirmPassword');
+
+    if (!password || !confirmPassword) return null;
+
+    return password.value === confirmPassword.value ? 
+      null : { 'passwordMismatch': true };
+  }
+
+  getErrorMessage(controlName: string): string {
+    const control = this.registerForm.get(controlName);
+    if (!control) return '';
+
+    if (control.hasError('required')) {
+      return 'Este campo es requerido';
+    }
+
+    if (control.hasError('minlength')) {
+      const minLength = control.errors?.['minlength'].requiredLength;
+      return `Mínimo ${minLength} caracteres`;
+    }
+
+    if (control.hasError('email')) {
+      return 'Email inválido';
+    }
+
+    if (control.hasError('pattern')) {
+      if (controlName === 'username') {
+        return 'Solo letras, números y los caracteres . _ -';
+      }
+      if (controlName === 'password') {
+        return 'Debe contener mayúsculas, minúsculas y números';
+      }
+    }
+
+    if (control.hasError('passwordMismatch')) {
+      return 'Las contraseñas no coinciden';
+    }
+
+    return '';
   }
 
   onSubmit(): void {
-    if (this.registerForm.invalid) return;
+    if (this.registerForm.invalid || this.loading) return;
 
     this.loading = true;
-    this.error = '';
+    this.errorMessage = '';
 
     this.authService.register(this.registerForm.value).subscribe({
-      next: () => {
-        this.snackBar.open('Registration successful! Please login.', 'Close', {
-          duration: 3000,
-          horizontalPosition: 'end',
-          verticalPosition: 'top'
-        });
-        this.router.navigate(['/login']);
+      next: (response: ApiResponse<AuthResponse>) => {
+        if (response.isSuccess) {
+          this.notificationService.success('Registro exitoso! Por favor inicie sesión');
+          this.router.navigate(['/login']);
+        } else {
+          this.notificationService.error(response.message || 'Error en el registro');
+        }
+        this.loading = false;
       },
-      error: err => {
-        this.error = err.error?.message || 'An error occurred during registration';
-        this.snackBar.open(this.error, 'Close', {
-          duration: 3000,
-          horizontalPosition: 'end',
-          verticalPosition: 'top'
-        });
+      error: (error: any) => {
+        console.error('Error durante el registro:', error);
+        this.errorMessage = error.error?.message || 
+                           'Error durante el registro. Por favor, inténtelo de nuevo';
+        this.notificationService.error(this.errorMessage);
         this.loading = false;
       }
+    });
+  }
+
+  onReset(): void {
+    this.registerForm.reset();
+    this.errorMessage = '';
+    Object.keys(this.registerForm.controls).forEach(key => {
+      this.registerForm.get(key)?.setErrors(null);
     });
   }
 }

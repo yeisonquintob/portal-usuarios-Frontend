@@ -1,4 +1,3 @@
-// src/app/services/notification.service.ts
 import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 
@@ -23,15 +22,6 @@ export class NotificationService {
       horizontalPosition: 'end',
       verticalPosition: 'top',
       panelClass: ['error-snackbar']
-    });
-  }
-
-  info(message: string): void {
-    this.snackBar.open(message, 'Cerrar', {
-      duration: 3000,
-      horizontalPosition: 'end',
-      verticalPosition: 'top',
-      panelClass: ['info-snackbar']
     });
   }
 

@@ -1,108 +1,17 @@
-// components/auth/login/login.component.ts
-import { Component } from '@angular/core';
+// ./app/components/auth/login/login.component.ts
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
-import { MatSnackBar } from '@angular/material/snack-bar';
+import { NotificationService } from '../../../services/notification.service';
 
 @Component({
   selector: 'app-login',
-  template: `
-    <div class="login-container">
-      <mat-card>
-        <mat-card-header>
-          <mat-card-title>Iniciar Sesión</mat-card-title>
-        </mat-card-header>
-
-        <mat-card-content>
-          <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" #formDirective="ngForm">
-            <mat-form-field appearance="outline">
-              <mat-label>Usuario</mat-label>
-              <input matInput formControlName="username" [disabled]="loading">
-              <mat-error *ngIf="loginForm.get('username')?.hasError('required')">
-                Usuario es requerido
-              </mat-error>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Contraseña</mat-label>
-              <input matInput [type]="hidePassword ? 'password' : 'text'" 
-                     formControlName="password" [disabled]="loading">
-              <button mat-icon-button matSuffix (click)="hidePassword = !hidePassword" 
-                      [attr.aria-label]="'Ocultar contraseña'" type="button">
-                <mat-icon>{{hidePassword ? 'visibility_off' : 'visibility'}}</mat-icon>
-              </button>
-              <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
-                Contraseña es requerida
-              </mat-error>
-            </mat-form-field>
-
-            <div class="actions">
-              <button mat-raised-button color="primary" type="submit"
-                      [disabled]="loginForm.invalid || loading">
-                <mat-icon *ngIf="loading">
-                  <mat-spinner diameter="20"></mat-spinner>
-                </mat-icon>
-                <span>{{ loading ? 'Iniciando sesión...' : 'Iniciar sesión' }}</span>
-              </button>
-              <a mat-button routerLink="/register">Crear cuenta</a>
-            </div>
-          </form>
-        </mat-card-content>
-      </mat-card>
-    </div>
-  `,
-  styles: [`
-    .login-container {
-      height: calc(100vh - 64px);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      padding: 16px;
-    }
-
-    mat-card {
-      width: 100%;
-      max-width: 400px;
-      margin: 2rem;
-    }
-
-    mat-form-field {
-      width: 100%;
-      margin-bottom: 1rem;
-    }
-
-    .actions {
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      margin-top: 1rem;
-
-      button {
-        width: 100%;
-      }
-    }
-
-    .mat-mdc-progress-spinner {
-      display: inline-block;
-      margin-right: 8px;
-    }
-
-    @media (min-width: 600px) {
-      .actions {
-        flex-direction: row;
-        justify-content: space-between;
-        align-items: center;
-        
-        button {
-          width: auto;
-        }
-      }
-    }
-  `]
+  templateUrl: './login.component.html',
+  styleUrls: ['./login.component.scss']
 })
-export class LoginComponent {
-  loginForm: FormGroup;
+export class LoginComponent implements OnInit {
+  loginForm!: FormGroup;
   loading = false;
   hidePassword = true;
 
@@ -110,43 +19,41 @@ export class LoginComponent {
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private snackBar: MatSnackBar
-  ) {
+    private notificationService: NotificationService
+  ) {}
+
+  ngOnInit(): void {
+    this.initForm();
+  }
+
+  private initForm(): void {
     this.loginForm = this.fb.group({
       username: ['', [Validators.required]],
-      password: ['', [Validators.required]]
+      password: ['', [Validators.required, Validators.minLength(8)]]
     });
   }
 
   onSubmit(): void {
-    if (this.loginForm.invalid || this.loading) return;
+    if (this.loginForm.invalid || this.loading) {
+      return;
+    }
 
     this.loading = true;
     const credentials = this.loginForm.value;
-    console.log('Intentando login con:', credentials.username);
 
     this.authService.login(credentials).subscribe({
       next: (response) => {
-        console.log('Login exitoso:', response);
-        this.snackBar.open('Inicio de sesión exitoso', 'Cerrar', {
-          duration: 2000,
-          horizontalPosition: 'end',
-          verticalPosition: 'top',
-          panelClass: ['success-snackbar']
-        });
-        this.router.navigate(['/profile']);
+        if (response.isSuccess) {
+          this.notificationService.success('Inicio de sesión exitoso');
+          this.router.navigate(['/profile']);
+        } else {
+          this.notificationService.error(response.message || 'Error al iniciar sesión');
+        }
       },
       error: (error) => {
         console.error('Error en login:', error);
-        this.snackBar.open(
-          error.error?.message || 'Error al iniciar sesión. Por favor, verifica tus credenciales.',
-          'Cerrar',
-          {
-            duration: 4000,
-            horizontalPosition: 'end',
-            verticalPosition: 'top',
-            panelClass: ['error-snackbar']
-          }
+        this.notificationService.error(
+          error.error?.message || 'Error al iniciar sesión. Por favor, verifique sus credenciales.'
         );
         this.loading = false;
       },
@@ -155,4 +62,8 @@ export class LoginComponent {
       }
     });
   }
+
+  // Getters para fácil acceso en el template
+  get usernameControl() { return this.loginForm.get('username'); }
+  get passwordControl() { return this.loginForm.get('password'); }
 }

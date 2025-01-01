@@ -1,4 +1,4 @@
-<!-- profile.component.html -->
+<!-- src/app/components/profile/profile.component.html -->
 <div class="profile-container">
   <mat-card>
     <mat-card-header>
@@ -11,13 +11,12 @@
     </mat-card-header>
 
     <mat-card-content>
-      <!-- Loading Spinner -->
       <div *ngIf="loading" class="loading-container">
         <mat-spinner diameter="40"></mat-spinner>
       </div>
 
       <form [formGroup]="profileForm" (ngSubmit)="onSubmit()" *ngIf="!loading">
-        <!-- Profile Picture Section -->
+        <!-- Sección de foto de perfil -->
         <div class="profile-picture-section">
           <input type="file" #fileInput hidden (change)="onFileSelected($event)" accept="image/*">
           <button mat-stroked-button type="button" (click)="fileInput.click()" [disabled]="!isEditMode">
@@ -26,74 +25,83 @@
           </button>
         </div>
 
-        <!-- Basic Information -->
-        <div class="form-section">
-          <h3>Información Básica</h3>
-          
+        <mat-form-field appearance="outline">
+          <mat-label>Usuario</mat-label>
+          <input matInput formControlName="username" readonly>
+          <mat-icon matSuffix>person</mat-icon>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Correo electrónico</mat-label>
+          <input matInput formControlName="email" [readonly]="!isEditMode">
+          <mat-icon matSuffix>email</mat-icon>
+          <mat-error *ngIf="emailControl?.errors?.['required']">
+            El correo electrónico es requerido
+          </mat-error>
+          <mat-error *ngIf="emailControl?.errors?.['email']">
+            Ingrese un correo electrónico válido
+          </mat-error>
+        </mat-form-field>
+
+        <div class="name-fields">
           <mat-form-field appearance="outline">
-            <mat-label>Usuario</mat-label>
-            <input matInput formControlName="username">
-            <mat-icon matSuffix>person</mat-icon>
+            <mat-label>Nombre</mat-label>
+            <input matInput formControlName="firstName" [readonly]="!isEditMode">
+            <mat-error *ngIf="firstNameControl?.errors?.['required']">
+              El nombre es requerido
+            </mat-error>
           </mat-form-field>
 
-          <div class="form-row">
-            <mat-form-field appearance="outline">
-              <mat-label>Nombre</mat-label>
-              <input matInput formControlName="firstName" [readonly]="!isEditMode">
-              <mat-error *ngIf="profileForm.get('firstName')?.errors?.['required']">
-                El nombre es requerido
-              </mat-error>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline">
-              <mat-label>Apellido</mat-label>
-              <input matInput formControlName="lastName" [readonly]="!isEditMode">
-              <mat-error *ngIf="profileForm.get('lastName')?.errors?.['required']">
-                El apellido es requerido
-              </mat-error>
-            </mat-form-field>
-          </div>
-
           <mat-form-field appearance="outline">
-            <mat-label>Correo electrónico</mat-label>
-            <input matInput formControlName="email" type="email" [readonly]="!isEditMode">
-            <mat-icon matSuffix>email</mat-icon>
-            <mat-error *ngIf="profileForm.get('email')?.errors?.['required']">
-              El correo electrónico es requerido
-            </mat-error>
-            <mat-error *ngIf="profileForm.get('email')?.errors?.['email']">
-              Por favor ingrese un correo electrónico válido
+            <mat-label>Apellido</mat-label>
+            <input matInput formControlName="lastName" [readonly]="!isEditMode">
+            <mat-error *ngIf="lastNameControl?.errors?.['required']">
+              El apellido es requerido
             </mat-error>
           </mat-form-field>
         </div>
 
-        <!-- Password Change Section (Only visible in edit mode) -->
-        <div class="form-section" *ngIf="isEditMode">
+        <!-- Sección de cambio de contraseña -->
+        <div class="password-section" *ngIf="isEditMode">
           <h3>Cambiar Contraseña</h3>
           
           <mat-form-field appearance="outline">
-            <mat-label>Contraseña actual</mat-label>
-            <input matInput type="password" formControlName="currentPassword">
-            <mat-icon matSuffix>lock</mat-icon>
+            <mat-label>Contraseña Actual</mat-label>
+            <input matInput [type]="hideCurrentPassword ? 'password' : 'text'" 
+                   formControlName="currentPassword">
+            <button mat-icon-button matSuffix (click)="hideCurrentPassword = !hideCurrentPassword" type="button">
+              <mat-icon>{{hideCurrentPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+            </button>
+            <mat-error *ngIf="profileForm.hasError('currentPasswordRequired')">
+              La contraseña actual es requerida para cambiar la contraseña
+            </mat-error>
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Nueva contraseña</mat-label>
-            <input matInput type="password" formControlName="newPassword">
-            <mat-icon matSuffix>lock_clock</mat-icon>
+            <mat-label>Nueva Contraseña</mat-label>
+            <input matInput [type]="hideNewPassword ? 'password' : 'text'" 
+                   formControlName="newPassword">
+            <button mat-icon-button matSuffix (click)="hideNewPassword = !hideNewPassword" type="button">
+              <mat-icon>{{hideNewPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+            </button>
+            <mat-error *ngIf="profileForm.get('newPassword')?.errors?.['pattern']">
+              La contraseña debe contener al menos 8 caracteres, una mayúscula, una minúscula y un número
+            </mat-error>
           </mat-form-field>
 
           <mat-form-field appearance="outline">
-            <mat-label>Confirmar nueva contraseña</mat-label>
-            <input matInput type="password" formControlName="confirmNewPassword">
-            <mat-icon matSuffix>lock_clock</mat-icon>
-            <mat-error *ngIf="profileForm.errors?.['passwordMismatch']">
+            <mat-label>Confirmar Nueva Contraseña</mat-label>
+            <input matInput [type]="hideConfirmPassword ? 'password' : 'text'" 
+                   formControlName="confirmNewPassword">
+            <button mat-icon-button matSuffix (click)="hideConfirmPassword = !hideConfirmPassword" type="button">
+              <mat-icon>{{hideConfirmPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
+            </button>
+            <mat-error *ngIf="profileForm.hasError('passwordMismatch')">
               Las contraseñas no coinciden
             </mat-error>
           </mat-form-field>
         </div>
 
-        <!-- Action Buttons -->
         <div class="button-container">
           <button mat-stroked-button type="button" (click)="toggleEditMode()" *ngIf="!isEditMode">
             <mat-icon>edit</mat-icon>
@@ -105,7 +113,8 @@
               <mat-icon>close</mat-icon>
               Cancelar
             </button>
-            <button mat-raised-button color="primary" type="submit" [disabled]="profileForm.invalid">
+            <button mat-raised-button color="primary" type="submit"
+                    [disabled]="profileForm.invalid || loading">
               <mat-icon>save</mat-icon>
               Guardar Cambios
             </button>
